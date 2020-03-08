@@ -17,7 +17,7 @@ public class CustomerSender {
     }
 
     public void createCustomer(Customer customer) {
-        String routingKey = "customer.created";
+        String routingKey = "customer.routingkey";
         this.rabbitTemplate.convertAndSend(this.exchange.getName(), routingKey, customer);
     }
 }
