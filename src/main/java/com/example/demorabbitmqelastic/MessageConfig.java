@@ -4,15 +4,18 @@ import org.springframework.amqp.core.Exchange;
 import org.springframework.amqp.core.TopicExchange;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.amqp.support.converter.MessageConverter;
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
-@SpringBootApplication
-public class DemoRabbitmqElasticApplication {
+@Configuration
+public class MessageConfig {
+    @Bean
+    public Exchange eventExchange() {
+        return new TopicExchange("eventExchange");
+    }
 
-	public static void main(String[] args) {
-		SpringApplication.run(DemoRabbitmqElasticApplication.class, args);
-	}
-
+    @Bean
+    public MessageConverter messageConverter() {
+        return new Jackson2JsonMessageConverter();
+    }
 }

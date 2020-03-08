@@ -6,12 +6,12 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 
 @Service
-public class CustomerService {
+public class CustomerSender {
 
     private final RabbitTemplate rabbitTemplate;
     private final Exchange exchange;
 
-    public CustomerService(RabbitTemplate rabbitTemplate, Exchange exchange) {
+    public CustomerSender(RabbitTemplate rabbitTemplate, Exchange exchange) {
         this.rabbitTemplate = rabbitTemplate;
         this.exchange = exchange;
     }

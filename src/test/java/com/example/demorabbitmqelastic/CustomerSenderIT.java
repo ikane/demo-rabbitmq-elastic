@@ -17,9 +17,9 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
-@ContextConfiguration(initializers = CustomerServiceIT.Initializer.class)
+@ContextConfiguration(initializers = CustomerSenderIT.Initializer.class)
 @Testcontainers
-class CustomerServiceIT {
+class CustomerSenderIT {
 
     public static final int RABBITMQ_PORT = 5672;
 
@@ -28,7 +28,7 @@ class CustomerServiceIT {
                                                         .withExposedPorts(RABBITMQ_PORT);
 
     @Autowired
-    private CustomerService customerService;
+    private CustomerSender customerSender;
 
     @Test
     void createCustomer() {
@@ -39,7 +39,7 @@ class CustomerServiceIT {
                 .build();
 
         // When
-        customerService.createCustomer(customer);
+        customerSender.createCustomer(customer);
 
         // Then
 
