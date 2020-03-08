@@ -5,3 +5,7 @@ docker run -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" docker.elas
 ***************************************************************************
 
 docker run -d --name rabbitmq -p 5672:5672 -p 15672:15672 rabbitmq:3-management
+
+
+https://gaddings.io/testing-spring-boot-apps-with-rabbitmq-using-testcontainers/
+
