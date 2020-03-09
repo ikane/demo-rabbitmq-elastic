@@ -13,3 +13,6 @@ https://gaddings.io/testing-spring-boot-apps-with-rabbitmq-using-testcontainers/
 
 
 https://github.com/wonwoo/spring-boot-elasticsearch-test/blob/master/src/test/java/com/example/data/DataElasticTestIntegrationTests.java
+
+
+https://piotrminkowski.com/2019/03/29/elasticsearch-with-spring-boot/
