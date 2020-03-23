@@ -19,3 +19,5 @@ https://github.com/wonwoo/spring-boot-elasticsearch-test/blob/master/src/test/ja
 https://piotrminkowski.com/2019/03/29/elasticsearch-with-spring-boot/
 
 https://dzone.com/articles/spring-boot-elasticsearch?fromrel=true
+
+https://www.geekyhacker.com/2019/05/08/integration-test-with-testcontainers-in-java/
