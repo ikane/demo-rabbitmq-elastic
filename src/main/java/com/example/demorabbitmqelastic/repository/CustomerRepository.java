@@ -6,5 +6,5 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.elasticsearch.repository.ElasticsearchRepository;
 
 public interface CustomerRepository extends ElasticsearchRepository<Customer, String> {
-    Page<Customer> findCustomerByName(String name, Pageable pageable);
+    Page<Customer> findByNameContaining(String name, Pageable pageable);
 }

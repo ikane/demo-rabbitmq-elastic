@@ -13,6 +13,7 @@ import org.springframework.boot.test.util.TestPropertyValues;
 import org.springframework.context.ApplicationContextInitializer;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
@@ -29,14 +30,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 @Testcontainers
-//@ContextConfiguration(initializers = CustomerElasticIT.Initializer.class)
-@ContextConfiguration(classes = ElasticsearchConfig.class/*, initializers = CustomerElasticIT.Initializer.class*/)
+@ContextConfiguration(initializers = CustomerElasticIT.Initializer.class)
 public class CustomerElasticIT {
 
     @Container
-   /* public static ElasticsearchContainer elasticsearchContainer = new ElasticsearchContainer("elasticsearch:7.6.1")
-            .withExposedPorts(9200, 9300);*/
-    public static ElasticsearchContainer elasticsearchContainer = new CustomerElasticsearchContainer();
+   public static ElasticsearchContainer elasticsearchContainer = new ElasticsearchContainer("elasticsearch:7.6.1");
 
     @BeforeAll
     static void setup() {
@@ -46,7 +44,6 @@ public class CustomerElasticIT {
     @BeforeEach
     void testIsContainerRunning() {
         assertThat(elasticsearchContainer.isRunning()).isTrue();
-        //assertTrue(elasticsearchContainer.isRunning());
         //recreateIndex();
     }
 
@@ -55,18 +52,6 @@ public class CustomerElasticIT {
     static void destroy() {
         elasticsearchContainer.stop();
     }
-
-    /*
-    GenericContainer container = new GenericContainer("docker.elastic.co/elasticsearch/elasticsearch:6.1.1")
-         .withEnv("discovery.type", "single-node")
-         .withExposedPorts(9200)
-         .waitingFor(
-           Wait
-           .forHttp("/_cat/health?v&pretty")
-           .forStatusCode(200)
-         );
-     */
-
 
     //@Autowired
     //private CustomerService customerService;
@@ -87,7 +72,7 @@ public class CustomerElasticIT {
         Customer customer = Customer.builder()
                 .id("1")
                 .name("Ibrahima KANE")
-                .email("irahima.kane@carrefour.com")
+                .email("ibrahima.kane@carrefour.com")
                 .address(Address.builder().street("1 rue Antoine de Saint Exupery").zipCode("94270").country("FRANCE").build())
                 .build();
 
@@ -100,7 +85,9 @@ public class CustomerElasticIT {
         String documentId = elasticsearchOperations.index(indexQuery);
 
         // THEN
-        Page<Customer> customerByName = customerRepository.findCustomerByName("Ibrahima KANE", Pageable.unpaged());
+        Page<Customer> customerByName = customerRepository.findByNameContaining("KANE", PageRequest.of(1,1));
+
+        Iterable<Customer> customers = customerRepository.findAll();
 
         Optional<Customer> byId = customerRepository.findById("1");
 
@@ -108,17 +95,16 @@ public class CustomerElasticIT {
         assertThat(customerByName).isNotNull();
     }
 
-    /*
+
     public static class Initializer implements ApplicationContextInitializer<ConfigurableApplicationContext> {
 
         @Override
         public void initialize(ConfigurableApplicationContext context) {
             TestPropertyValues.of(
-                    "elasticsearch.host=" + elasticsearchContainer.getHttpHostAddress(),
-                    "elasticsearch.port=" + elasticsearchContainer.getMappedPort(9200)
+                    "elasticsearch.host=" + elasticsearchContainer.getHttpHostAddress()
             ).applyTo(context);
         }
     }
-*/
+
 
 }

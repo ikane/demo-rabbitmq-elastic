@@ -20,7 +20,7 @@ public class ElasticsearchConfig extends AbstractElasticsearchConfiguration {
     @Value("${elasticsearch.host:localhost}")
     private String host;
 
-    @Value("${elasticsearch.port:9200}")
+    @Value("${elasticsearch.port:0}")
     private int port;
 
     @Bean
@@ -30,10 +30,18 @@ public class ElasticsearchConfig extends AbstractElasticsearchConfiguration {
 
         ClientConfiguration clientConfiguration = ClientConfiguration.builder()
                 //.connectedTo(new InetSocketAddress(host, port))
-                .connectedTo(host + ":" + port)
+                .connectedTo(getHttpHostAddress())
                 .build();
 
         return RestClients.create(clientConfiguration).rest();
+    }
+
+    public String getHttpHostAddress() {
+        String result = host;
+        if(port != 0) {
+            result += ":" + port;
+        }
+        return result;
     }
 
 }
