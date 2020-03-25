@@ -80,6 +80,8 @@ public class CustomerElasticIT {
         IndexQuery indexQuery = new IndexQueryBuilder()
                 .withId(customer.getId())
                 .withObject(customer)
+                .withIndexName("users")
+                .withType("customer")
                 .build();
 
         String documentId = elasticsearchOperations.index(indexQuery);
