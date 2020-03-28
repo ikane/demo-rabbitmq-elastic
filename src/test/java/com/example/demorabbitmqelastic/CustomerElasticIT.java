@@ -2,7 +2,6 @@ package com.example.demorabbitmqelastic;
 import com.example.demorabbitmqelastic.domain.Address;
 import com.example.demorabbitmqelastic.domain.Customer;
 import com.example.demorabbitmqelastic.repository.CustomerRepository;
-import org.elasticsearch.client.RestHighLevelClient;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -12,11 +11,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.util.TestPropertyValues;
 import org.springframework.context.ApplicationContextInitializer;
 import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
-import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
+import org.springframework.data.elasticsearch.core.query.GetQuery;
 import org.springframework.data.elasticsearch.core.query.IndexQuery;
 import org.springframework.data.elasticsearch.core.query.IndexQueryBuilder;
 import org.springframework.test.context.ContextConfiguration;
@@ -24,7 +20,8 @@ import org.testcontainers.elasticsearch.ElasticsearchContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
-import java.util.Optional;
+import java.util.List;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -53,8 +50,8 @@ public class CustomerElasticIT {
         elasticsearchContainer.stop();
     }
 
-    //@Autowired
-    //private CustomerService customerService;
+    @Autowired
+    private CustomerService customerService;
 
 //    @Autowired
 //    RestHighLevelClient elasticsearchClient;
@@ -65,16 +62,26 @@ public class CustomerElasticIT {
     @Autowired
     CustomerRepository customerRepository;
 
+    @Test
+    public void testSaveCustomerWithService() {
+        // GIVEN
+        Customer customer = givenCustomer();
+
+        // WHEN
+        Customer createdCustomer = this.customerService.createCustomer(customer);
+
+        // THEN
+        List<Customer> customers = this.customerService.findCustomers();
+
+        assertThat(createdCustomer).isNotNull();
+        assertThat(customers).isNotNull();
+        assertThat(customers).isNotEmpty();
+    }
 
     @Test
-    public void testSaveCustomer() {
+    public void testSaveCustomerWithElasticApi() {
         // GIVEN
-        Customer customer = Customer.builder()
-                .id("1")
-                .name("Ibrahima KANE")
-                .email("ibrahima.kane@carrefour.com")
-                .address(Address.builder().street("1 rue Antoine de Saint Exupery").zipCode("94270").country("FRANCE").build())
-                .build();
+        Customer customer = givenCustomer();
 
         // WHEN
         IndexQuery indexQuery = new IndexQueryBuilder()
@@ -87,14 +94,20 @@ public class CustomerElasticIT {
         String documentId = elasticsearchOperations.index(indexQuery);
 
         // THEN
-        Page<Customer> customerByName = customerRepository.findByNameContaining("KANE", PageRequest.of(1,1));
-
-        Iterable<Customer> customers = customerRepository.findAll();
-
-        Optional<Customer> byId = customerRepository.findById("1");
+        GetQuery query = GetQuery.getById(documentId);
+        Customer createdCustomer = elasticsearchOperations.queryForObject(query, Customer.class);
 
         assertThat(documentId).isNotNull();
-        assertThat(customerByName).isNotNull();
+        assertThat(createdCustomer).isNotNull();
+    }
+
+    private Customer givenCustomer() {
+        return Customer.builder()
+                .id(UUID.randomUUID().toString())
+                .name("Ibrahima KANE")
+                .email("ibrahima.kane@carrefour.com")
+                .address(Address.builder().street("1 rue Antoine de Saint Exupery").zipCode("94270").country("FRANCE").build())
+                .build();
     }
 
 
