@@ -24,3 +24,5 @@ https://dzone.com/articles/spring-boot-elasticsearch?fromrel=true
 https://www.geekyhacker.com/2019/05/08/integration-test-with-testcontainers-in-java/
 
 https://www.brightmarbles.io/blog/blog-posts/elasticsearch-java-clients-3/
+
+https://www.oodlestechnologies.com/blogs/How-To-Use-Invoke-Elastic-Search-With-SpringBoot-Rest-API/

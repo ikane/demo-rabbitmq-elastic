@@ -44,4 +44,14 @@ public class ElasticsearchConfig extends AbstractElasticsearchConfiguration {
         return result;
     }
 
+    /*
+    @Bean
+    public ElasticsearchRestTemplate elasticsearchTemplate(ElasticsearchProperties configuration) {
+        var nodes =  Stream.of(configuration.getClusterNodes().split(",")).map(HttpHost::create).toArray(HttpHost[]::new);
+        var client = new RestHighLevelClient(RestClient.builder(nodes));
+        var converter = new CustomElasticSearchConverter(new SimpleElasticsearchMappingContext(), createConversionService());
+        return new ElasticsearchRestTemplate(client, converter, new DefaultResultMapper(converter));
+    }
+     */
+
 }
