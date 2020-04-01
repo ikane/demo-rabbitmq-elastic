@@ -27,27 +27,7 @@ import static org.mockito.Mockito.verify;
 
 @SpringBootTest
 @ContextConfiguration(initializers = CustomerSenderIT.Initializer.class)
-@Testcontainers
-class CustomerSenderIT {
-
-    public static final int RABBITMQ_PORT = 5672;
-
-    @Container
-    public static GenericContainer rabbitMq = new GenericContainer("rabbitmq:3.7-management")
-                                                        .withExposedPorts(RABBITMQ_PORT);
-
-    @Container
-    public static ElasticsearchContainer elasticsearchContainer = new ElasticsearchContainer("elasticsearch:7.6.1");
-
-    @BeforeAll
-    static void setup() {
-        elasticsearchContainer.start();
-    }
-
-    @AfterAll
-    static void destroy() {
-        elasticsearchContainer.stop();
-    }
+class CustomerSenderIT  extends AbstractIntegrationTest {
 
     @Autowired
     private CustomerSender customerSender;
@@ -79,20 +59,5 @@ class CustomerSenderIT {
         verify(customerListener, timeout(1000)).receive(any());
         //assertThat(logCaptor.getLogs("info")).containsExactly(expectedInfoMessage);
         //assertThat(logCaptor.getLogs("info")).isNotEmpty();
-    }
-
-    public static class Initializer implements ApplicationContextInitializer<ConfigurableApplicationContext> {
-
-        @Override
-        public void initialize(ConfigurableApplicationContext configurableApplicationContext) {
-            TestPropertyValues propertyValues = TestPropertyValues.of(
-                    "spring.rabbitmq.host=" + rabbitMq.getContainerIpAddress(),
-                    "spring.rabbitmq.port=" + rabbitMq.getMappedPort(RABBITMQ_PORT),
-                    "elasticsearch.host=" + elasticsearchContainer.getContainerIpAddress(),
-                    "elasticsearch.port=" + elasticsearchContainer.getMappedPort(9200)
-            );
-
-            propertyValues.applyTo(configurableApplicationContext);
-        }
     }
 }
