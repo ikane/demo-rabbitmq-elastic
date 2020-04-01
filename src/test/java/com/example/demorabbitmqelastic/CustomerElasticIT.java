@@ -16,6 +16,7 @@ import org.springframework.data.elasticsearch.core.query.GetQuery;
 import org.springframework.data.elasticsearch.core.query.IndexQuery;
 import org.springframework.data.elasticsearch.core.query.IndexQueryBuilder;
 import org.springframework.test.context.ContextConfiguration;
+import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.elasticsearch.ElasticsearchContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -31,7 +32,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class CustomerElasticIT {
 
     @Container
-   public static ElasticsearchContainer elasticsearchContainer = new ElasticsearchContainer("elasticsearch:7.6.1");
+    public static ElasticsearchContainer elasticsearchContainer = new ElasticsearchContainer("elasticsearch:7.6.1");
 
     @BeforeAll
     static void setup() {
@@ -115,9 +116,18 @@ public class CustomerElasticIT {
 
         @Override
         public void initialize(ConfigurableApplicationContext context) {
+/*
+
             TestPropertyValues.of(
                     "elasticsearch.host=" + elasticsearchContainer.getHttpHostAddress()
             ).applyTo(context);
+*/
+
+            TestPropertyValues.of(
+                    "elasticsearch.host=" + elasticsearchContainer.getContainerIpAddress(),
+                    "elasticsearch.port=" + elasticsearchContainer.getMappedPort(9200)
+            ).applyTo(context);
+
         }
     }
 

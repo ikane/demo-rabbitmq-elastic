@@ -23,7 +23,7 @@ public class ElasticsearchConfig extends AbstractElasticsearchConfiguration {
     @Value("${elasticsearch.port:0}")
     private int port;
 
-    @Bean
+    //@Bean
     @Override
     public RestHighLevelClient elasticsearchClient() {
         //return RestClients.create(ClientConfiguration.localhost()).rest();
