@@ -6,13 +6,15 @@ import com.example.demorabbitmqelastic.repository.CustomerRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.action.search.SearchRequest;
+import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.client.core.CountRequest;
-import org.elasticsearch.index.query.BoolQueryBuilder;
-import org.elasticsearch.index.query.ExistsQueryBuilder;
-import org.elasticsearch.index.query.MatchQueryBuilder;
-import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.index.query.*;
+import org.elasticsearch.search.aggregations.Aggregation;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
+import org.elasticsearch.search.aggregations.Aggregations;
+import org.elasticsearch.search.aggregations.bucket.terms.ParsedStringTerms;
+import org.elasticsearch.search.aggregations.bucket.terms.StringTerms;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms;
 import org.elasticsearch.search.aggregations.bucket.terms.TermsAggregationBuilder;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
@@ -25,7 +27,9 @@ import org.springframework.data.elasticsearch.core.query.SearchQuery;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
 import static org.elasticsearch.index.query.QueryBuilders.matchQuery;
@@ -70,6 +74,30 @@ public class CustomerService {
     }
 
     public Object getCustomerAggregateByGender() {
+        TermsAggregationBuilder aggregation = AggregationBuilders.terms("genders_stats").field("gender");
+
+        BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
+        boolQueryBuilder.must(QueryBuilders.matchQuery("married", true));
+
+        NativeSearchQuery searchQuery = new NativeSearchQueryBuilder()
+                .withIndices("users")
+                .withTypes("customer")
+                .withQuery(boolQueryBuilder)
+                .addAggregation(aggregation)
+                .build();
+
+        Aggregations aggregations = this.elasticsearchOperations.query(searchQuery, response -> response.getAggregations());
+        Map<String, Aggregation> aggregationMap = aggregations.asMap();
+        ParsedStringTerms stringTerms = (ParsedStringTerms) aggregationMap.get("genders_stats");
+        List<? extends Terms.Bucket> buckets = stringTerms.getBuckets();
+
+        Map<String, Long> stats = new HashMap<>();
+        buckets.forEach(bucket -> stats.put(bucket.getKeyAsString().toUpperCase(), bucket.getDocCount()));
+
+        return stats;
+    }
+
+    public Object testComplexQueries() {
         //this.customerRepository.
         //this.elasticsearchOperations.
         /*
@@ -81,7 +109,7 @@ public class CustomerService {
                                                                        .withQuery(matchAllQuery()) //
                                                                        .withSearchType(SearchType.DEFAULT) //
                                                                        .addAggregation(terms("genders").field(
-                                                                               "gender")) //
+                                                                               "gender.keyword")) //
                                                                        .build();
 
         ResultsExtractor<?> resultsExtractor = response -> response.getAggregations();
