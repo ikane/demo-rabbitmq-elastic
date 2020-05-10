@@ -77,7 +77,8 @@ public class CustomerService {
         TermsAggregationBuilder aggregation = AggregationBuilders.terms("genders_stats").field("gender");
 
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
-        boolQueryBuilder.must(QueryBuilders.matchQuery("married", true));
+        boolQueryBuilder.filter(QueryBuilders.matchQuery("married", true));
+        //boolQueryBuilder.must(QueryBuilders.matchQuery("married", true));
 
         NativeSearchQuery searchQuery = new NativeSearchQueryBuilder()
                 .withIndices("users")
@@ -152,6 +153,24 @@ public class CustomerService {
         log.info("result {}", query);
 
         return query;
+    }
+
+    public Page<Customer> getMarriedFemaleWithoutAddress() {
+        BoolQueryBuilder builder = QueryBuilders.boolQuery();
+
+        //builder.must(QueryBuilders.matchQuery("gender", "F"));
+        //builder.must(QueryBuilders.matchQuery("married", true));
+        builder.filter(QueryBuilders.termQuery("gender.keyword", "F"));
+        builder.filter(QueryBuilders.termQuery("married", true));
+        builder.mustNot(QueryBuilders.existsQuery("address"));
+        //builder.must(QueryBuilders.termQuery("gender", "F"));
+
+        NativeSearchQuery searchQuery3 = new NativeSearchQueryBuilder() //
+                                                                        .withQuery(builder) //
+                                                                        .withSearchType(SearchType.DEFAULT) //
+                                                                        .build();
+        Page<Customer> page = this.customerRepository.search(searchQuery3);
+        return page;
     }
 
 }

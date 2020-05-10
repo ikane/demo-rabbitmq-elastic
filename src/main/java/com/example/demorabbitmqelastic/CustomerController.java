@@ -37,6 +37,11 @@ public class CustomerController {
 	@GetMapping("/aggregates/gender")
 	public Object getGenderAggregates() {
 		return customerService.getCustomerAggregateByGender();
+	}
+
+	@GetMapping("/marriedFemaleWithoutAddress")
+	public Object getMarriedFemaleWithoutAddress() {
+		return customerService.getMarriedFemaleWithoutAddress();
 
 	}
 }
